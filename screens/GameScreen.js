@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, Button } from "react-native";
+import React, { useState, useRef } from "react";
+import { View, Text, StyleSheet, Button, Alert } from "react-native";
 
 import NumberContainer from "../components/NumberContainer";
 import Card from "../components/Card";
+import Colors from "../constants/colors";
 
 const generateRandomBetween = (min, max, exclude) => {
   min = Math.ceil(min);
@@ -19,13 +20,52 @@ const GameScreen = props => {
   const [currentGuess, setCurrentGuess] = useState(
     generateRandomBetween(1, 100, props.userChoice)
   );
+  const currentLow = useRef(1);
+  const currentHigh = useRef(100);
+
+  const nextGuessHandler = direction => {
+    console.log(direction);
+    if (
+      (direction === "lower" && currentGuess < props.userChoice) ||
+      (direction === "greater" && currentGuess > props.userChoice)
+    ) {
+      Alert.alert("I see what you did", "You are cheating, don't you?", [
+        { text: "Okay", style: "cancel" }
+      ]);
+      return;
+    }
+    if (direction === "lower") {
+      currentHigh.current = currentGuess;
+    } else {
+      currentLow.current = currentGuess;
+    }
+    const nextNumber = generateRandomBetween(
+      currentLow.current,
+      currentHigh.current,
+      currentGuess
+    );
+    setCurrentGuess(nextNumber);
+  };
+
   return (
     <View style={styles.screen}>
       <Text>Opponent's Guess</Text>
       <NumberContainer>{currentGuess}</NumberContainer>
       <Card style={styles.buttonContainer}>
-        <Button title="Lower" onPress={() => console.log("lower")} />
-        <Button title="Greater" onPress={() => console.log("greater")} />
+        <View style={styles.button}>
+          <Button
+            title="Lower"
+            onPress={() => nextGuessHandler("lower")}
+            color={Colors.primary}
+          />
+        </View>
+        <View style={styles.button}>
+          <Button
+            title="Greater"
+            onPress={() => nextGuessHandler("greater")}
+            color={Colors.primary}
+          />
+        </View>
       </Card>
     </View>
   );
@@ -43,6 +83,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
     width: 300,
     maxWidth: "80%"
+  },
+  button: {
+    width: 120
   }
 });
 export default GameScreen;
