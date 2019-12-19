@@ -7,5 +7,10 @@ export default StyleSheet.create({
   title: {
     fontFamily: "open-sans-bold",
     fontSize: 18
+  },
+  center: {
+    alignItems: "center",
+    textAlign: "center",
+    justifyContent: "center"
   }
 });
